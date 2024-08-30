@@ -67,15 +67,18 @@ def create_dataframe(filename, *args):
         df_sst.index = pd.Index([ds_date] * len(df_sst))
         complete_data = pd.concat([complete_data, df_sst])
 
-    complete_data.to_csv(f'data/aqua_modis_csv/{filename}.csv')
+    complete_data.to_csv(f'data/aqua_modis_csv/{filename}.csv', index=False)
 
     return complete_data
 
 
-def extract_datasets(directory_name, filename=None):
+def extract_datasets(directory_name, ext=None):
     """
-    Function that walks through a specified directory, reads all .nc files,
-    and extract the dataset to a list.
+    Function that walks through a specified directory, reads all .nc/.csv files,
+    and extract the dataset to a list if required, and return them within a single list object.
+
+    :param directory_name: pass the path to the target directory
+    :param ext: pass the type of file to be extracted. ['nc'] - if reading .nc files or ['csv'] for csv files
     """
     result = []
 

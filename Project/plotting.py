@@ -7,13 +7,15 @@ import numpy as np
 from scipy.interpolate import griddata
 
 
-def plot_equatorial_pacific(df, cond_name=None, plot_type='cnt'):
+def plot_equatorial_pacific(df, cond_name=None, plot_type='cnt', vmin=None, vmax=None):
     """
     The function will plot the sequential months of SST,
     with each month's data on a separate subplot.
 
     :param cond_name: Taking the name of the plotted event
     :param plot_type: Defaults to contour map. Choose between contour map ['cnt'] and scatter plot ['sct'].
+    :param vmin: pass the minimum scale of the temperature
+    :param vmax: pass the maximum scale of the temperature
     """
 
     grouped_df = df.groupby(df.index)
@@ -30,7 +32,9 @@ def plot_equatorial_pacific(df, cond_name=None, plot_type='cnt'):
 
     # Determine the common range for the color scale
     all_sst_values = df['sst'].values
-    vmin, vmax = np.min(all_sst_values), np.max(all_sst_values)
+
+    if vmin is None or vmax is None:
+        vmin, vmax = np.min(all_sst_values), np.max(all_sst_values)
 
     for i, (date, data) in enumerate(grouped_df):
 
@@ -44,7 +48,6 @@ def plot_equatorial_pacific(df, cond_name=None, plot_type='cnt'):
             sst_grid = griddata((data.lon, data.lat), data.sst, (lon_grid, lat_grid), method='linear')
 
             subplot = axs[i].contourf(lon_grid, lat_grid, sst_grid, cmap='jet', levels=20, vmin=vmin, vmax=vmax)
-
 
         fig.colorbar(subplot, ax=axs[i], label='Temperature')
 
