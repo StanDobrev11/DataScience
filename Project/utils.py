@@ -36,7 +36,7 @@ def filter_coordinates(df):
     return df
 
 
-def create_dataframe(*args, **kwargs):
+def create_dataframe(filename, *args):
     """ the function accepts list of datasets and concatenate them into one single .csv file while
     extracts the SST and joins the date index
     coordinates denotes the start-end point (lat,lon)
@@ -60,11 +60,14 @@ def create_dataframe(*args, **kwargs):
 
         df_sst.sst = df_sst.sst.apply(lambda x: round(x, 1))  # rounding the sst
 
+        df_sst['lon'] = np.where(df_sst['lon'] < 0, df_sst['lon'] + 360, df_sst['lon'])  # adjusting for negative long
+        df_sst.sort_values(['lat', 'lon'])
+
         ds_date = extract_date(dataset)
         df_sst.index = pd.Index([ds_date] * len(df_sst))
         complete_data = pd.concat([complete_data, df_sst])
 
-    complete_data.to_csv('data/csv/test_csv.csv')
+    complete_data.to_csv(f'data/aqua_modis_csv/{filename}.csv')
 
     return complete_data
 
