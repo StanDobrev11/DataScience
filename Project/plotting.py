@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from scipy.interpolate import griddata
 
 import matplotlib.pyplot as plt
@@ -7,7 +8,7 @@ import numpy as np
 from scipy.interpolate import griddata
 
 
-def plot_equatorial_pacific(df, cond_name=None, plot_type='cnt', vmin=None, vmax=None):
+def plot_equatorial_pacific(df, cond_name, plot_type='cnt', vmin=None, vmax=None):
     """
     The function will plot the sequential months of SST,
     with each month's data on a separate subplot.
@@ -71,7 +72,7 @@ def plot_equatorial_pacific(df, cond_name=None, plot_type='cnt', vmin=None, vmax
         axs[i].set_ylim(-20, 20)
         axs[i].set_xlabel('Longitude')
         axs[i].set_ylabel('Latitude')
-        axs[i].set_title(f'{cond_name} SST for {date.strftime("%B %Y")}')
+        axs[i].set_title(f'{cond_name} SST for {pd.to_datetime(date).strftime("%B %Y")}')
 
     plt.tight_layout()
     plt.show()
