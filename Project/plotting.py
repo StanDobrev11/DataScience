@@ -8,16 +8,24 @@ import numpy as np
 from scipy.interpolate import griddata
 
 
-def plot_equatorial_pacific(df, cond_name, plot_type='cnt', vmin=None, vmax=None):
+def get_dataframe(path):
+    df = pd.read_csv(path, index_col=0)
+    df.index = pd.to_datetime(df.index)
+
+    return df
+
+
+def plot_equatorial_pacific(path, cond_name, plot_type='cnt', vmin=None, vmax=None):
     """
     The function will plot the sequential months of SST,
     with each month's data on a separate subplot.
-
+    :param path: path to the file to plot
     :param cond_name: Taking the name of the plotted event
     :param plot_type: Defaults to contour map. Choose between contour map ['cnt'] and scatter plot ['sct'].
     :param vmin: pass the minimum scale of the temperature
     :param vmax: pass the maximum scale of the temperature
     """
+    df = get_dataframe(path)
 
     grouped_df = df.groupby(df.index)
 

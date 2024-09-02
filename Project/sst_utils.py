@@ -4,7 +4,7 @@ import xarray as xr
 import os
 import netCDF4
 
-from Project.common import save_data
+from common import save_data
 
 
 def round_to_nearest_half(x):
