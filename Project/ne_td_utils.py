@@ -169,8 +169,6 @@ def jma_date_time(value):
 
 
 
-
-
 if __name__ == '__main__':
     print(jma_date_time('500522'))
     # Example usage with different formats
