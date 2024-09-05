@@ -1,6 +1,6 @@
 import pandas as pd
 
-from Project.common import save_data
+from common import save_data
 
 
 def export_name_basin_count(df):

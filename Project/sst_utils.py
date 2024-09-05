@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 import os
-import netCDF4
 
 from common import save_data
 
