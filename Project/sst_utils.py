@@ -7,12 +7,26 @@ from common import save_data
 
 
 def round_to_nearest_half(x):
-    """ the function returns the value rounded to the nearest half """
+    """
+    Rounds the input value to the nearest half.
+
+    Parameters:
+        x (float): The input value to be rounded.
+    Returns:
+        float: The value rounded to the nearest half.
+    """
     return np.round(x * 2) / 2
 
 
 def convert_to_datetime(date):
-    """ converts and normalize the Timestamp obj """
+    """
+    Converts a given date to a Pandas Timestamp object and normalizes it to midnight.
+
+    Parameters:
+        date (str or datetime-like): The date to be converted and normalized.
+    Returns:
+        Timestamp: The normalized Pandas Timestamp object.
+    """
     date = pd.to_datetime(date)  # convert the string to pd.Timestamp object
     date = date.normalize()  # normalize timestamp
 
@@ -20,19 +34,41 @@ def convert_to_datetime(date):
 
 
 def extract_date(dataset):
-    """ the function extracts the date from the dataset, converts it to datetime object and returns it normalized """
+    """
+    Extracts the date from a dataset and converts it to a normalized datetime object.
+
+    Parameters:
+        dataset (xarray.Dataset): The dataset from which to extract the date.
+    Returns:
+        Timestamp: The normalized date extracted from the dataset.
+    """
     date = dataset.attrs['time_coverage_start']  # extract the date from the dataset
 
     return convert_to_datetime(date)
 
 
 def generate_coordinates_filter_query(coordinates):
-    """ extracts the lat and long for the filter query """
+    """
+    Generates a filter query for the given coordinates.
+
+    Parameters:
+        coordinates (list): A list of latitude and longitude coordinates.
+    Returns:
+        None: Placeholder function (currently does not return anything).
+    """
     for point in coordinates:
         pass
 
 
 def filter_coordinates(df):
+    """
+        Filters a DataFrame based on latitude and longitude bounds for the region of interest.
+
+        Parameters:
+            df (DataFrame): The input DataFrame containing 'lat' and 'lon' columns.
+        Returns:
+            DataFrame: A filtered DataFrame with latitude between -20 and 20, and longitude between 130E and 180 or -80W.
+        """
     # filtering lat[20S; 20N]
     df = df[(df['lat'] >= -20) & (df['lat'] <= 20)]
 
@@ -43,9 +79,15 @@ def filter_coordinates(df):
 
 
 def dataset_to_csv(filename, array):
-    """ the function accepts list of datasets and concatenate them into one single .csv file while
-    extracts the SST and joins the date index
-    coordinates denotes the start-end point (lat,lon)
+    """
+    Concatenates multiple datasets into a single CSV file by extracting Sea Surface Temperature (SST)
+    and joining the date index. The data is filtered and cleaned before saving.
+
+    Parameters:
+        filename (str): The name of the output CSV file.
+        array (list of xarray.Datasets): A list of datasets to concatenate and process.
+    Returns:
+        DataFrame: The combined DataFrame containing SST data for all datasets.
     """
 
     complete_data = pd.DataFrame([])  # creating empty dataframe
@@ -80,11 +122,13 @@ def dataset_to_csv(filename, array):
 
 def read_files(directory_name, ext):
     """
-    Function that walks through a specified directory, reads all .nc/.csv files,
-    and extract the dataset to a list if required, and return them within a single list object.
+    Reads all files with a given extension from a directory and returns a list of the datasets.
 
-    :param directory_name: path to the directory
-    :param ext: takes file extension, 'csv' or 'nc'
+    Parameters:
+        directory_name (str): The directory to search for files.
+        ext (str): The file extension ('csv' or 'nc') to filter files by.
+    Returns:
+        list: A list of datasets (xarray.Dataset for 'nc' files, or DataFrames for 'csv' files).
     """
     result = []
 
@@ -113,12 +157,14 @@ def read_files(directory_name, ext):
 
 def clean_csvs(filename, array, start_date):
     """
-    the function will clean the dataframe preparing for plotting and analysis and concatenate to a single csv file
+    Cleans and prepares a list of DataFrames for plotting and analysis, concatenating them into a single CSV file.
 
-    :param filename: name of file to save
-    :param array: list of dataframes
-    :param start_date: date/month of starting the dataframe collection in format YYYY-MM
-    :return: list of pd.DataFrame compiled, cleand data
+    Parameters:
+        filename (str): The name of the output CSV file.
+        array (list of DataFrames): A list of DataFrames to clean and process.
+        start_date (str): The start date for the DataFrame collection in the format 'YYYY-MM'.
+    Returns:
+        DataFrame: The combined and cleaned DataFrame.
     """
 
     complete_data = pd.DataFrame([])  # creating empty dataframe
@@ -157,15 +203,16 @@ def clean_csvs(filename, array, start_date):
     return complete_data
 
 
-
 def csv_from_avhrp_csv(directory_name, output_file, start_date):
     """
-    Passes the .csv in provided dirname, cleans and arranges the data
+    Processes and cleans multiple CSV files from a directory, then compiles the data into a single CSV file.
 
-    :param directory_name: path to the directory
-    :param output_file: filename of the output compiled csv
-    :param start_date: indicate YYYY-MM of start of the dataframe. pass as indicated
-    :return: list of pd.Dataframe objects
+    Parameters:
+        directory_name (str): The directory containing the input CSV files.
+        output_file (str): The name of the output compiled CSV file.
+        start_date (str): The start date for the DataFrame collection in the format 'YYYY-MM'.
+    Returns:
+        DataFrame: The compiled DataFrame containing data from all input CSV files.
     """
 
     dataset_array = read_files(directory_name, ext='csv')
@@ -176,11 +223,13 @@ def csv_from_avhrp_csv(directory_name, output_file, start_date):
 
 def csv_from_aqua_modis_dataset(directory_name, output_file):
     """
-    Passes the .nc in provided dirname, cleans and arranges the data
+    Processes and cleans multiple netCDF files from a directory, then compiles the data into a single CSV file.
 
-    :param directory_name: path to the directory
-    :param output_file: filename of the output compiled csv
-    :return: list of pd.Dataframe objects
+    Parameters:
+        directory_name (str): The directory containing the input netCDF files.
+        output_file (str): The name of the output compiled CSV file.
+    Returns:
+        DataFrame: The compiled DataFrame containing data from all input netCDF files.
     """
     dataset_array = read_files(directory_name, ext='nc')
     compiled_data = dataset_to_csv(output_file, dataset_array)
@@ -189,6 +238,12 @@ def csv_from_aqua_modis_dataset(directory_name, output_file):
 
 
 def create_urls():
+    """
+        Generates URLs for downloading AQUA MODIS SST data from the NASA Ocean Data server.
+
+        Returns:
+            list: A list of URLs for downloading SST data from January 2002 to December 2022.
+        """
     result = []
 
     base_url = "https://oceandata.sci.gsfc.nasa.gov/cgi/getfile/AQUA_MODIS.{start_date}_{end_date}.L3m.MO.SST.sst.9km.nc"

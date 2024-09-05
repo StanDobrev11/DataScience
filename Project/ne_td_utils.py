@@ -4,6 +4,15 @@ from common import save_data
 
 
 def export_name_basin_count(df):
+    """
+    Adds 'basin' and 'name' columns to the DataFrame, populates them based on non-numeric time entries,
+    and assigns corresponding values to rows where 'time' contains numeric values.
+
+    Parameters:
+        df (DataFrame): The input DataFrame containing tropical depression data with 'time', 'date', and 'consecutive_count' columns.
+    Returns:
+        DataFrame: The modified DataFrame with 'basin', 'name', and 'consecutive_count' columns populated.
+    """
     # adding additional cols for the type, name
     df['basin'] = pd.Series()
     df['name'] = pd.Series()
@@ -28,6 +37,15 @@ def export_name_basin_count(df):
 
 
 def clean_ne_td_data(df):
+    """
+    Cleans and processes the Northeast Pacific tropical depression data by resetting the index, renaming columns,
+    and formatting 'time', 'date', 'lat', and 'lon' fields. Also applies filtering and data corrections.
+
+    Parameters:
+        df (DataFrame): The input DataFrame with raw tropical depression data.
+    Returns:
+        DataFrame: The cleaned and processed DataFrame ready for analysis.
+    """
     # reset index
     df = df.reset_index()
     # rename columns from 0 to len
@@ -79,11 +97,31 @@ def clean_ne_td_data(df):
 
 
 def convert_lat_lon_to_number(value):
+    """
+    Converts latitude or longitude string values with directional suffixes (N, S, E, W) to float values.
+    'S' and 'W' are converted to negative values, with 'W' values adjusted by adding 360 degrees.
+
+    Parameters:
+        value (str): The latitude or longitude string to be converted.
+
+    Returns:
+        float: The numeric latitude or longitude value.
+    """
     # adds '-' for 'S' and 'W' values and adds 360 deg to negative 'W'
     return float(value[:-1]) if (value[-1] == 'N' or value[-1] == 'E') else float(value[:-1]) * -1 + 360
 
 
 def modify_jma_date(df):
+    """
+    Modifies the 'date' column in the JMA (Japan Meteorological Agency) dataset by applying the 'jma_date_time' function
+    and setting the resulting values as the index.
+
+    Parameters:
+        df (DataFrame): The input DataFrame with a 'date' column.
+
+    Returns:
+        DataFrame: The DataFrame with modified 'date' values and the 'date' column set as the index.
+    """
     df.date = df.date.apply(jma_date_time)
     df.index = pd.Index(df.date)
     df = df.drop(columns='date')
@@ -92,6 +130,16 @@ def modify_jma_date(df):
 
 
 def cleaning_jma_columns(df):
+    """
+    Cleans and processes columns in the JMA dataset. It handles missing or invalid values, converts data types,
+    and scales latitude and longitude columns.
+
+    Parameters:
+        df (DataFrame): The input DataFrame containing JMA tropical depression data.
+
+    Returns:
+        DataFrame: The cleaned DataFrame with properly formatted columns.
+    """
     # wind column
     df.max_wind_kn = df.max_wind_kn.apply(lambda x: '000' if pd.isna(x) else x)
     df.max_wind_kn = df.max_wind_kn.astype('int')
@@ -109,6 +157,16 @@ def cleaning_jma_columns(df):
 
 
 def clean_jma_data(data_path='data/jma_data/bst_all.txt'):
+    """
+    Cleans and processes JMA tropical depression data from the provided file. Extracts names, cleans the data,
+    modifies dates, and returns the cleaned dataset.
+
+    Parameters:
+        data_path (str): The file path to the JMA dataset.
+
+    Returns:
+        DataFrame: The cleaned DataFrame with tropical depression data.
+    """
     # read the data and extract the header rows
     header_col_space = [5, 4, 3, 4, 4, 1, 20, 8]
     extract_names = pd.read_fwf(data_path, widths=header_col_space, header=None)
@@ -147,7 +205,16 @@ def clean_jma_data(data_path='data/jma_data/bst_all.txt'):
 
 
 def jma_date_time(value):
-    """ will be applied to all values in the column """
+    """
+    Converts a string representing date and time in JMA format to a Pandas Timestamp object.
+    The format is 'YYMMDDHH', where 'YY' is the year, 'MM' is the month, 'DD' is the day, and 'HH' is the hour.
+
+    Parameters:
+        value (str): The date-time string in JMA format.
+
+    Returns:
+        Timestamp: The converted Pandas Timestamp object representing the date and time.
+    """
 
     date = value[:-2]
     time = value[-2:]
@@ -168,10 +235,8 @@ def jma_date_time(value):
     return date
 
 
-
 if __name__ == '__main__':
     print(jma_date_time('500522'))
     # Example usage with different formats
     values = ['99022006', '00031112', '13071212']
     converted_dates = [jma_date_time(value) for value in values]
-

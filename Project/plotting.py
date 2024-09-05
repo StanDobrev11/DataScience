@@ -6,6 +6,14 @@ from scipy.interpolate import griddata
 
 
 def get_dataframe(path):
+    """
+    Reads a CSV file into a Pandas DataFrame and converts the index to datetime format.
+
+    Parameters:
+        path (str): The file path of the CSV to read.
+    Returns:
+        DataFrame: A Pandas DataFrame with the index converted to datetime.
+    """
     df = pd.read_csv(path, index_col=0)
     df.index = pd.to_datetime(df.index)
 
@@ -14,13 +22,18 @@ def get_dataframe(path):
 
 def plot_equatorial_pacific(path, cond_name, plot_type='cnt', vmin=None, vmax=None):
     """
-    The function will plot the sequential months of SST,
-    with each month's data on a separate subplot.
-    :param path: path to the file to plot
-    :param cond_name: Taking the name of the plotted event
-    :param plot_type: Defaults to contour map. Choose between contour map ['cnt'] and scatter plot ['sct'].
-    :param vmin: pass the minimum scale of the temperature
-    :param vmax: pass the maximum scale of the temperature
+    Plots sequential months of Sea Surface Temperature (SST) data for the equatorial Pacific Ocean,
+    with each month's data displayed on a separate subplot. The user can choose between a contour map
+    or scatter plot for visualization.
+
+    Parameters:
+        path (str): Path to the CSV file containing SST data.
+        cond_name (str): The name of the event to be plotted (e.g., "El Niño", "La Niña").
+        plot_type (str): The type of plot to create, either contour map ['cnt'] (default) or scatter plot ['sct'].
+        vmin (float, optional): The minimum scale value for the temperature color range. Defaults to the minimum SST value in the data.
+        vmax (float, optional): The maximum scale value for the temperature color range. Defaults to the maximum SST value in the data.
+    Returns:
+        None: Displays the subplots showing SST data for each month.
     """
     df = get_dataframe(path)
 
